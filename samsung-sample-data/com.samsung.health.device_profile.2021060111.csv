@@ -1,0 +1,6 @@
+com.samsung.health.device_profile,1144003,6
+create_time,capability,update_time,pkg_name,providing_step_goal,step_source_group,device_type,backsync_step_goal,deviceuuid,manufacturer,connectivity_type,datauuid,device_group,model,fixed_name,name
+"05/31/2021, 12:45:32 PM",,"05/31/2021, 12:45:32 PM",com.sec.android.app.shealth,,,,,C/h8iEGOM6,Apple,,65643561-3731-6665-6230-303538393535,360001,iPhone 6,iPhone 6,My Device,
+"05/31/2021, 12:46:49 PM",,"05/31/2021, 12:46:49 PM",com.sec.android.app.shealth,,,,,VfS0qUERdZ,Combined,,37616639-3732-3263-6364-393930376237,0,Combined,,Combined,
+"05/31/2021, 12:47:14 PM",61303464-6536-6630-6133-333231343037.capability,"05/31/2021, 12:47:14 PM",com.sec.android.app.shealth,1,19,10046,1,XMabZl3IH3,Samsung Electronics,,61303464-6536-6630-6133-333231343037,360003,SM-R500,,Galaxy Watch Active,
+

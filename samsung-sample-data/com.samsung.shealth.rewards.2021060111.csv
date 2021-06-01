@@ -1,0 +1,4 @@
+com.samsung.shealth.rewards,1144003,4
+is_visible,pkg_name,number_of_streak,time_offset,exercise_type,source_pkg_name,start_time,device_type,program_id,title,deviceuuid,exercise_session_id,controller_id,end_time,extra_data,datauuid,create_time,update_time
+1,com.sec.android.app.shealth,,-18000000,,,"06/01/2021, 5:10:00 AM",,,goal_sleep_TYPE_GOAL_DAILY_WAKEUP_TIME,C/h8iEGOM6,,Sleep.Goal,"05/31/2021, 11:40:00 PM",1,86586c83-9ad6-4375-84c7-039db7002706,"06/01/2021, 11:22:25 AM","06/01/2021, 11:22:25 AM",
+
