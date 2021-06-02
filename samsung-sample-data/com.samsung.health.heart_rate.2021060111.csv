@@ -1,4 +1,3 @@
-com.samsung.health.heart_rate,1144003,8
 pkg_name,heart_beat_count,time_offset,binning_data,max,heart_rate,comment,start_time,deviceuuid,custom,end_time,datauuid,create_time,update_time,min
 com.sec.android.app.shealth,1,-18000000,,0.000000,62.000000,,"05/31/2021, 12:50:48 PM",XMabZl3IH3,,"05/31/2021, 12:50:48 PM",fd5fc1d4-415b-6ba3-0f0f-0bad7a35736e,"05/31/2021, 12:51:04 PM","05/31/2021, 12:51:04 PM",0.000000,
 com.sec.android.app.shealth,1,-18000000,,0.000000,68.000000,,"05/31/2021, 1:40:59 PM",XMabZl3IH3,,"05/31/2021, 1:40:59 PM",8ebd0611-6d48-0b27-3624-b6e3f1264d01,"05/31/2021, 1:44:53 PM","05/31/2021, 1:44:53 PM",0.000000,
