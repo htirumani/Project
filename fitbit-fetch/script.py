@@ -28,7 +28,7 @@ ACCESS_TOKEN = str(server.fitbit.client.session.token['access_token'])
 REFRESH_TOKEN = str(server.fitbit.client.session.token['refresh_token'])
 auth2_client = fitbit.Fitbit(CLIENT_ID,CLIENT_SECRET,oauth2=True,access_token=ACCESS_TOKEN,refresh_token=REFRESH_TOKEN)
 
-today = datetime.today().strftime('%Y-%m-%d')
+day = datetime.today().strftime('%Y-%m-%d')
 
 # get data from API calls
 data_body = auth2_client.body(day)
