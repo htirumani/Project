@@ -100,7 +100,7 @@ def runner(date, user, saveData):
 
     # push docs to MongoDB
     push_docs(sleep_docs, 'test', 'sleep')
-    push_docs(heart_docs, 'test', 'heartrate')
+    push_docs(heart_docs, 'test', 'heart')
 
 # Verifies arguments
 if __name__ == "__main__":
