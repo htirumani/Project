@@ -1,0 +1,5 @@
+{"user": 1, "device": 0, "date": "1 June 2021", "minute": "00:00", "heart_rate": 60},
+{"user": 1, "device": 0, "date": "1 June 2021", "minute": "00:01", "heart_rate": 65},
+{"user": 1, "device": 0, "date": "1 June 2021", "minute": "00:02", "heart_rate": 62},
+{"user": 2, "device": 1, "date": "5 June 2021", "minute": "12:02", "heart_rate": 72},
+{"user": 2, "device": 1, "date": "5 June 2021", "minute": "12:03", "heart_rate": 70}
