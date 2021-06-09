@@ -29,7 +29,7 @@ Some quick notes
 	"user" : 1,
  	"device" : 0,
  	"date" : "2021-06-01",
- 	"time" : "00:00:00",
+ 	"time" : "00:00",
  	"stage" : 1
 }
 ```
@@ -40,7 +40,7 @@ Some quick notes
 	"user" : 1,
  	"device" : 0,
  	"date" : "2021-06-01",
- 	"time" : "00:00:00",
+ 	"time" : "00:00",
  	"value" : 60
 }
 ```
