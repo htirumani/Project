@@ -37,12 +37,13 @@ def parse_sleep(data, user):
     docs = []
 
     for min in minData: # generate doc using below template
+        stage = 1 if min.get('value') == 1 else 0
         doc = {
             'user' : user,
             'device' : 0,
             'date' : date,
             'minute' : min.get('dateTime')[:-3],
-            'stage' : min.get('value')}
+            'stage' : stage}
         docs.append(doc)
 
     return docs
@@ -64,6 +65,27 @@ def parse_heart(data, user):
 
     return docs
 
+# parse step data into appropriate JSON docs
+def parse_step(data, user):
+    date = data.get('activities-steps')[0].get('dateTime')
+    minData = data.get('activities-steps-intraday').get('dataset')
+    docs = []
+
+    for min in minData: # generate doc using below template
+        doc = {
+            'user' : user,
+            'device' : 0,
+            'date' : date,
+            'minute' : min.get('time')[:-3],
+            'step' : min.get('value')}
+        docs.append(doc)
+
+    return docs
+
+# parse body data into appropriate JSON docs
+def parse_body(data, user):
+    print("todo")
+    
 # pushes all docs in docs to specified collection in MongoDB
 def push_docs(docs, base, feature):
     client = MongoClient(ATLAS)
@@ -82,13 +104,16 @@ def runner(date, user, saveData):
     day = date
 
     # get data from API calls
-    data_body = auth2_client.body(day)
     data_sleep = auth2_client.sleep(day)
     data_heart = auth2_client.intraday_time_series('activities/heart', day)
-
+    data_step = auth2_client.intraday_time_series('activities/steps', day)
+    data_body = auth2_client.body(day)
+    
     # create relevant docs from API data
     sleep_docs = parse_sleep(data_sleep, user)
     heart_docs = parse_heart(data_heart, user)
+    step_docs = parse_step(data_step, user)
+    #body_docs = parse_body(data_body, user)
 
     # save data to external JSON files
     if saveData:
@@ -97,10 +122,12 @@ def runner(date, user, saveData):
         write_json(data_body, new_dir+'/body.json')
         write_json(data_sleep, new_dir+'/sleep.json')
         write_json(data_heart, new_dir+'/heart.json')
+        write_json(data_steps, new_dir+'/steps.json')
 
     # push docs to MongoDB
     push_docs(sleep_docs, 'test', 'sleep')
     push_docs(heart_docs, 'test', 'heart')
+    push_docs(step_docs, 'test', 'step')
 
 # Verifies arguments
 if __name__ == "__main__":
