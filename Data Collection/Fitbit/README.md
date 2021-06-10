@@ -1,6 +1,6 @@
 # Fitbit
 
-Utilizes [Fitbit unofficial API](https://github.com/orcasgit/python-fitbit) to fetch user data and format JSON docs for every minute, adapted from an [article](https://towardsdatascience.com/using-the-fitbit-web-api-with-python-f29f119621ea) by Michael Galarnyk. Then it pushes these docs to the relevant collections in the MongoDB Atlas database. The script currently calls and pushes minute data for sleep and heart rate data.
+Utilizes [Fitbit unofficial API](https://github.com/orcasgit/python-fitbit) to fetch user data and format JSON docs for every minute, adapted from an [article](https://towardsdatascience.com/using-the-fitbit-web-api-with-python-f29f119621ea) by Michael Galarnyk. Then it pushes these docs to the relevant collections in the MongoDB Atlas database. The script currently calls and pushes minute data for sleep, heart rate, and step data.
 
 ## Using Script
 
@@ -29,7 +29,7 @@ Some quick notes
 	"user" : 1,
  	"device" : 0,
  	"date" : "2021-06-01",
- 	"time" : "00:00",
+ 	"minute" : "00:00",
  	"stage" : 1
 }
 ```
@@ -40,8 +40,19 @@ Some quick notes
 	"user" : 1,
  	"device" : 0,
  	"date" : "2021-06-01",
- 	"time" : "00:00",
- 	"value" : 60
+ 	"minute" : "00:00",
+ 	"heart_rate" : 60
+}
+```
+
+### Step
+```json
+{
+	"user" : 1,
+ 	"device" : 0,
+ 	"date" : "2021-06-01",
+ 	"minute" : "00:00",
+ 	"step" : 60
 }
 ```
 
