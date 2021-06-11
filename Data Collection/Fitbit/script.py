@@ -133,8 +133,8 @@ def runner(date, user, saveData):
 if __name__ == "__main__":
     print(str(sys.argv))
     if len(sys.argv) == 3:
-        runner(sys.argv[1], sys.argv[2], False)
+        runner(sys.argv[1], int(sys.argv[2]), False)
     elif len(sys.argv) == 4 and sys.argv[3] == 'y':
-        runner(sys.argv[1], sys.argv[2], True)
+        runner(sys.argv[1], int(sys.argv[2]), True)
     else:
         print("Invalid number of arguments, check documentation.")
