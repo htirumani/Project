@@ -11,7 +11,7 @@ import os
 
 
 def get_combined_device_id(root_dir):
-    # get unique step_count csv path
+    # get unique device_profile csv path
     csv_path = ''
     for d in os.listdir(root_dir):
         if 'device_profile' in d:
@@ -40,7 +40,7 @@ df = df[['binning_data', 'create_time', 'deviceuuid']] # filter cols
 # convert datetime strings to datetime type
 df['create_time'] = pd.to_datetime(df['create_time'])
 
-# take only watch measurements, sort by date for iteration
+# take only combined measurements, sort by date for iteration
 df = df[df['deviceuuid'] == device_id]
 df = df.sort_values(by='create_time', ignore_index=True)
 
@@ -78,9 +78,6 @@ for index, row in df.iterrows():
                 'steps': running_total
             })
             active_time = active_time + one_min
-
-with open('steps.json', 'w') as outfile:
-    json.dump(docs, outfile)
 
 print('Pushing Data to Database...')
 
