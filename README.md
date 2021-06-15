@@ -8,8 +8,8 @@ To be clear, we'll be aggregating all features into a single dataset. When we "d
 1. Detect chunks of missing data
 2. Measure the size of each chunk
 3. Handle according to size:
-- $\geq$ 30 minutes: fill all values with average bpm of immediately surrounding measurements
-- >30 minutes: discard all measurements
+- less than 30 minutes: fill all values with average bpm of immediately surrounding measurements
+- greater than 30 minutes: discard all measurements
 
 #### Sleep
 1. Detect chunks of missing data
