@@ -64,6 +64,6 @@ print('Pushing Data to Database...')
 client = pymongo.MongoClient("mongodb+srv://max:iotreu2021@cluster0.bkddq.mongodb.net/wearabledb?retryWrites=true&w=majority", ssl=True, ssl_cert_reqs='CERT_NONE')
 db = client.wearabledb
 collection = db.heart
-collection.insert_many(docs)
+collection.insert_many(docs, ordered=False)
 
 print('Success')

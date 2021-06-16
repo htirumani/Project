@@ -57,6 +57,6 @@ client = pymongo.MongoClient(
     )
 db = client.wearabledb
 collection = db.sleep
-collection.insert_many(docs)
+collection.insert_many(docs, ordered=False)
 
 print('Success')
