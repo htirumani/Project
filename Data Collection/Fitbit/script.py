@@ -119,9 +119,9 @@ def runner(date, user, saveData):
         write_json(data_steps, new_dir+'/steps.json')
 
     # push docs to MongoDB
-    push_docs(sleep_docs, 'test', 'sleep')
-    push_docs(heart_docs, 'test', 'heart')
-    push_docs(step_docs, 'test', 'step')
+    push_docs(sleep_docs, 'wearabledb', 'sleep')
+    push_docs(heart_docs, 'wearabledb', 'heart')
+    push_docs(step_docs, 'wearabledb', 'step')
 
 # Verifies arguments
 if __name__ == "__main__":
