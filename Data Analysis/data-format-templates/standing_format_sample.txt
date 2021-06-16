@@ -1,5 +1,0 @@
-{"user": 1, "device": 0, "date": "1 June 2021", "minute": "00:00", "stand_time": 0},
-{"user": 1, "device": 0, "date": "1 June 2021", "minute": "00:01", "stand_time": 1},
-{"user": 1, "device": 0, "date": "1 June 2021", "minute": "00:02", "stand_time": 2},
-{"user": 2, "device": 1, "date": "5 June 2021", "minute": "12:02", "stand_time": 120},
-{"user": 2, "device": 1, "date": "5 June 2021", "minute": "12:03", "stand_time": 121}
