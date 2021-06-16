@@ -1,4 +1,5 @@
 {
 	"0": "awake",
-	"1": "asleep"
+	"1": "light sleep / restless",
+	"2": "deep sleep / REM sleep"
 }
