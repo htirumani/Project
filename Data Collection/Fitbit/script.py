@@ -9,6 +9,7 @@ https://github.com/orcasgit/python-fitbit
 from datetime import datetime
 from pymongo import MongoClient
 import gather_keys_oauth2 as Oauth2
+import datetime
 import fitbit
 import json
 import os
@@ -32,17 +33,17 @@ def parse_body(data, user):
 
 # parse sleep data into appropriate JSON docs
 def parse_sleep(data, user):
-    date = data.get('sleep')[0].get('dateOfSleep')
+    y,m,d = data.get('sleep')[0].get('dateOfSleep').split("-")
     minData = data.get('sleep')[0].get('minuteData')
     docs = []
 
     for min in minData: # generate doc using below template
         stage = 1 if min.get('value') == 1 else 0
+        H,M = min.get('dateTime')[:-3].split(":")
         doc = {
             'user' : user,
             'device' : 0,
-            'date' : date,
-            'minute' : min.get('dateTime')[:-3],
+            'datetime' : datetime.datetime(int(y),int(m),int(d), int(H),int(M)),
             'stage' : stage}
         docs.append(doc)
 
@@ -50,16 +51,16 @@ def parse_sleep(data, user):
 
 # parse heart rate data into appropriate JSON docs
 def parse_heart(data, user):
-    date = data.get('activities-heart')[0].get('dateTime')
+    y,m,d = data.get('activities-heart')[0].get('dateTime').split("-")
     minData = data.get('activities-heart-intraday').get('dataset')
     docs = []
     
     for min in minData: # generate doc using below template
+        H,M = min.get('time')[:-3].split(":")
         doc = {
             'user' : user,
             'device' : 0,
-            'date' : date,
-            'minute' : min.get('time')[:-3],
+            'datetime' : datetime.datetime(int(y),int(m),int(d), int(H),int(M)),
             'heart_rate' : min.get('value')}
         docs.append(doc)
 
@@ -67,24 +68,20 @@ def parse_heart(data, user):
 
 # parse step data into appropriate JSON docs
 def parse_step(data, user):
-    date = data.get('activities-steps')[0].get('dateTime')
+    y,m,d = data.get('activities-steps')[0].get('dateTime').split("-")
     minData = data.get('activities-steps-intraday').get('dataset')
     docs = []
 
     for min in minData: # generate doc using below template
+        H,M = min.get('time')[:-3].split(":")
         doc = {
             'user' : user,
             'device' : 0,
-            'date' : date,
-            'minute' : min.get('time')[:-3],
-            'step' : min.get('value')}
+            'datetime' : datetime.datetime(int(y),int(m),int(d), int(H),int(M)),
+            'steps' : min.get('value')}
         docs.append(doc)
 
     return docs
-
-# parse body data into appropriate JSON docs
-def parse_body(data, user):
-    print("todo")
     
 # pushes all docs in docs to specified collection in MongoDB
 def push_docs(docs, base, feature):
@@ -107,19 +104,16 @@ def runner(date, user, saveData):
     data_sleep = auth2_client.sleep(day)
     data_heart = auth2_client.intraday_time_series('activities/heart', day)
     data_step = auth2_client.intraday_time_series('activities/steps', day)
-    data_body = auth2_client.body(day)
     
     # create relevant docs from API data
     sleep_docs = parse_sleep(data_sleep, user)
     heart_docs = parse_heart(data_heart, user)
     step_docs = parse_step(data_step, user)
-    #body_docs = parse_body(data_body, user)
 
     # save data to external JSON files
     if saveData:
         new_dir = os.getcwd() + '/output/' + day
         os.mkdir(new_dir)
-        write_json(data_body, new_dir+'/body.json')
         write_json(data_sleep, new_dir+'/sleep.json')
         write_json(data_heart, new_dir+'/heart.json')
         write_json(data_steps, new_dir+'/steps.json')
