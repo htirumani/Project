@@ -68,22 +68,25 @@ for index, row in df.iterrows():
     one_min = datetime.timedelta(minutes=1)
     running_total = 0
     for i in raw_data:
-        running_total += i['mStepCount']
+        per_minute_steps = int(i['mStepCount'] / 10)
         for j in range(10):
             docs.append({
                 'user': user_ix,
                 'device': device_ix,
-                'date': dt.strftime('%Y-%m-%d'),
-                'minute': active_time.strftime('%H:%M'),
-                'steps': running_total
+                'datetime': active_time,
+                'steps': per_minute_steps,
             })
             active_time = active_time + one_min
 
 print('Pushing Data to Database...')
 
-client = pymongo.MongoClient("mongodb+srv://max:iotreu2021@cluster0.bkddq.mongodb.net/test?retryWrites=true&w=majority", ssl=True, ssl_cert_reqs='CERT_NONE')
-db = client.test
+client = pymongo.MongoClient(
+    "mongodb+srv://max:iotreu2021@cluster0.bkddq.mongodb.net/wearabledb?retryWrites=true&w=majority",
+    ssl=True,
+    ssl_cert_reqs='CERT_NONE'
+    )
+db = client.wearabledb
 collection = db.step
-collection.insert_many(docs)
+collection.insert_many(docs, ordered=False)
 
 print('Success')

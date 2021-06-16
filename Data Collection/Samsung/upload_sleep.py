@@ -43,8 +43,7 @@ for index, row in df.iterrows():
         docs.append({
             'user': user_ix,
             'device': device_ix,
-            'date': start.strftime('%Y-%m-%d'),
-            'minute': start.strftime('%H:%M'),
+            'datetime': start,
             'stage': stage
         })
         start = start + delta
@@ -52,11 +51,11 @@ for index, row in df.iterrows():
 print('Pushing Data to Database...')
 
 client = pymongo.MongoClient(
-    "mongodb+srv://max:iotreu2021@cluster0.bkddq.mongodb.net/test?retryWrites=true&w=majority",
+    "mongodb+srv://max:iotreu2021@cluster0.bkddq.mongodb.net/wearabledb?retryWrites=true&w=majority",
     ssl=True,
     ssl_cert_reqs='CERT_NONE'
     )
-db = client.test
+db = client.wearabledb
 collection = db.sleep
 collection.insert_many(docs)
 

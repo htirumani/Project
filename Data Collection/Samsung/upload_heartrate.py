@@ -54,16 +54,15 @@ for index, row in hr_csv.iterrows():
         docs.append({
             'user': user_ix,
             'device': device_ix,
-            'date': dt.strftime('%Y-%m-%d'),
-            'minute': dt.strftime('%H:%M'),
+            'datetime': dt,
             'heart_rate': int(i['heart_rate'])
         })
         dt = dt + delta
 
 print('Pushing Data to Database...')
 
-client = pymongo.MongoClient("mongodb+srv://max:iotreu2021@cluster0.bkddq.mongodb.net/test?retryWrites=true&w=majority", ssl=True, ssl_cert_reqs='CERT_NONE')
-db = client.test
+client = pymongo.MongoClient("mongodb+srv://max:iotreu2021@cluster0.bkddq.mongodb.net/wearabledb?retryWrites=true&w=majority", ssl=True, ssl_cert_reqs='CERT_NONE')
+db = client.wearabledb
 collection = db.heart
 collection.insert_many(docs)
 
