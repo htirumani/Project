@@ -38,7 +38,7 @@ def parse_sleep(data, user):
     docs = []
 
     for min in minData: # generate doc using below template
-        stage = 1 if min.get('value') == 1 else 0
+        stage = 0 if min.get('value') == 3 else 1
         H,M = min.get('dateTime')[:-3].split(":")
         doc = {
             'user' : user,
