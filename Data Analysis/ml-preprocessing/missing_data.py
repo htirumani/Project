@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 
 user0 = 'https://raw.githubusercontent.com/htirumani/Project/main/Data%20Analysis/ml-preprocessing/user0_df.csv'
-user2 = 'https://raw.githubusercontent.com/htirumani/Project/main/Data%20Analysis/ml-preprocessing/max_df.csv'
+user2 = 'https://raw.githubusercontent.com/htirumani/Project/main/Data%20Analysis/ml-preprocessing/user2_df.csv'
 
 toy_data = pd.read_csv(user2, index_col=0, skiprows=10096, nrows=100)
 
