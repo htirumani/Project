@@ -27,7 +27,7 @@ step = db.step
 START_DATE = datetime.datetime(2021, 5, 31)
 END_DATE = datetime.datetime(2021, 6, 17)
 DELTA = datetime.timedelta(minutes = 1)
-USER = 2
+USER = 0
 
 # defines various helper methods used in aggregate_feature_cols
 def get_user_sleep_data(user):
