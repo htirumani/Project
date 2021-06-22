@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import pandas as pd
 import numpy as np
 from pprint import pprint
@@ -9,16 +9,22 @@ user2 = 'https://raw.githubusercontent.com/htirumani/Project/main/Data%20Analysi
 user0r = 'Data Analysis/ml-preprocessing/user0_df.csv'
 user2r = 'Data Analysis/ml-preprocessing/user2_df.csv'
 
+'''
+Help from https://stackoverflow.com/questions/2119472/convert-a-timedelta-to-days-hours-and-minutes
+'''
 def process_heart(df):
     dates = get_dates(df, 'HEART')
   
     for d in dates:
         stime, etime = d
+        stime, etime = datetime.strptime(stime, '%Y-%m-%d %H:%M:%S'), datetime.strptime(etime, '%Y-%m-%d %H:%M:%S')
         delta = etime - stime
-    if delta.minutes() < 30:
-        v = df['HEART'].mean() # update ltr 
-        df['HEART'] = df['HEART'].fillna(v)
-    else: df.dropna(['HEART'])
+        days, hours, minutes = delta.days, delta.seconds // 3600, delta.seconds // 60 % 60
+        if minutes < 30:
+            v = df['HEART'].mean() # update ltr 
+            df['HEART'] = df['HEART'].fillna(v)
+        
+        df.dropna(subset=['HEART'], inplace=True)
 
 # fills in as "asleep" if missing data period is <30 mins and time is not between 0900-2100
 def process_sleep(df):
@@ -26,16 +32,17 @@ def process_sleep(df):
 
     for d in dates:
         stime, etime = d
+        stime, etime = datetime.strptime(stime, '%Y-%m-%d %H:%M:%S'), datetime.strptime(etime, '%Y-%m-%d %H:%M:%S')
         delta = etime - stime
-    if delta.minutes() < 30 and not ((stime.time.hour > 9) and (etime.time.hour < 21)):
-        fill_values(df, 'SLEEP', dates, 0)
+        days, hours, minutes = delta.days, delta.seconds // 3600, delta.seconds // 60 % 60
+        if minutes < 30 and not ((stime.time().hour > 9) and (etime.time().hour < 21)):
+            fill_values(df, 'SLEEP', d, 0)
 
-    df['SLEEP'] = df['SLEEP'].fillna(0)  
+    df['SLEEP'] = df['SLEEP'].fillna(0)
 
 # given steps data has very few null values and no obvious way to fill them, default to fill with 0
 def process_steps(df):
-    dates = get_dates(df, 'STEPS')
-    df['STEPS'] = df['STEPS'].fillna(0)
+    df['STEP'] = df['STEP'].fillna(0)
 
 # get list of tuples (stime, etime) of Nan data in feature
 def get_dates(df, feature):
@@ -78,10 +85,31 @@ def process_all(fp):
     start_date = df.iloc[0, :1]
     end_date = df.iloc[-1, :1]
     
+    # process missing values IN THIS ORDER
     process_heart(df)
     process_sleep(df)
     process_steps(df)
 
-    df.dropna(inplace = True)
+    df.dropna(inplace=True)  # drop remaining missing values
+    
+    df['USER'] = df['USER'].astype(int)
+    df['SLEEP'] = df['SLEEP'].astype(int)
+    df['HEART'] = df['HEART'].astype(int)
+    df['STEP'] = df['STEP'].astype(int)
+    df['WEIGHT'] = df['WEIGHT'].astype(int)
+    df['HEIGHT'] = df['HEIGHT'].astype(int)
 
-process_all(user2r)
+    return df
+
+df0 = process_all(user0r)
+df2 = process_all(user2r)
+
+print('NUM ROWS')
+print('Neelam:', df0.shape[0])
+print('Max:', df2.shape[0])
+
+print()
+print(df0.describe())
+
+print()
+print(df2.describe())
