@@ -2,6 +2,7 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 from pprint import pprint
+from matplotlib import pyplot as plt
 
 user0 = 'https://raw.githubusercontent.com/htirumani/Project/main/Data%20Analysis/ml-preprocessing/user0_df.csv'
 user2 = 'https://raw.githubusercontent.com/htirumani/Project/main/Data%20Analysis/ml-preprocessing/user2_df.csv'
@@ -103,13 +104,22 @@ def process_all(fp):
 
 df0 = process_all(user0r)
 df2 = process_all(user2r)
+merged = pd.concat([df0, df2])
 
 print('NUM ROWS')
 print('Neelam:', df0.shape[0])
 print('Max:', df2.shape[0])
+print('All:', merged.shape[0])
 
-print()
+print('\nNEELAM')
 print(df0.describe())
 
-print()
+print('\nMAX')
 print(df2.describe())
+
+print('\nALL')
+print(merged.describe())
+
+df0.to_csv('user0_df_clean.csv')
+df2.to_csv('user2_df_clean.csv')
+merged.to_csv('all_df_clean.csv')
