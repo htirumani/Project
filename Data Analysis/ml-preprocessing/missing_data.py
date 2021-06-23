@@ -7,8 +7,8 @@ from matplotlib import pyplot as plt
 user0 = 'https://raw.githubusercontent.com/htirumani/Project/main/Data%20Analysis/ml-preprocessing/user0_df.csv'
 user2 = 'https://raw.githubusercontent.com/htirumani/Project/main/Data%20Analysis/ml-preprocessing/user2_df.csv'
 
-user0r = 'Data Analysis/ml-preprocessing/user0_df.csv'
-user2r = 'Data Analysis/ml-preprocessing/user2_df.csv'
+user0r = 'Data Analysis/processed-data-files/user0_df.csv'
+user2r = 'Data Analysis/processed-data-files/user2_df.csv'
 
 '''
 Help from https://stackoverflow.com/questions/2119472/convert-a-timedelta-to-days-hours-and-minutes
@@ -22,10 +22,10 @@ def process_heart(df):
         delta = etime - stime
         days, hours, minutes = delta.days, delta.seconds // 3600, delta.seconds // 60 % 60
         if minutes < 30:
-            v = df['HEART'].mean() # update ltr 
-            df['HEART'] = df['HEART'].fillna(v)
+            v = mean_surrounding_values(df, 'HEART', d)
+            fill_values(df, 'HEART', d, v)
         
-        df.dropna(subset=['HEART'], inplace=True)
+    df.dropna(subset=['HEART'], inplace=True)
 
 # fills in as "asleep" if missing data period is <30 mins and time is not between 0900-2100
 def process_sleep(df):
@@ -67,7 +67,6 @@ def get_dates(df, feature):
     date_tups = [(df.at[s, 'DATE'], df.at[e, 'DATE']) for s, e in tups]
     return date_tups
 
-
 """
 Takes a tuple of dates, and populates feature from start date to end date with value.
 """
@@ -79,6 +78,24 @@ def fill_values(df, feature, dates, value):
     while sindex != eindex:
         df.at[sindex, feature] = value
         sindex += 1
+
+def mean_surrounding_values(df, feature, dates):
+    sdate, edate = dates
+    sindex = pd.Index(df['DATE']).get_loc(str(sdate))
+    eindex = pd.Index(df['DATE']).get_loc(str(edate))
+
+    if sindex == 0:
+        return df.at[eindex + 1, feature]
+
+    if eindex == df.shape[0] - 1:
+        return df.at[sindex - 1, feature]
+
+    before = df.at[sindex - 1, feature]
+    after = df.at[eindex + 1, feature]
+
+    m = int(np.mean([before, after]).item())
+
+    return m
 
 
 def process_all(fp):
