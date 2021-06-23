@@ -8,6 +8,7 @@ user0 = 'https://raw.githubusercontent.com/htirumani/Project/main/Data%20Analysi
 user2 = 'https://raw.githubusercontent.com/htirumani/Project/main/Data%20Analysis/ml-preprocessing/user2_df.csv'
 
 user0r = 'Data Analysis/processed-data-files/user0_df.csv'
+user1r = 'Data Analysis/processed-data-files/user1_df.csv'
 user2r = 'Data Analysis/processed-data-files/user2_df.csv'
 
 '''
@@ -119,24 +120,26 @@ def process_all(fp):
 
     return df
 
-df0 = process_all(user0r)
-df2 = process_all(user2r)
-merged = pd.concat([df0, df2])
+# df0 = process_all(user0r)
+df1 = process_all(user1r)
+# df2 = process_all(user2r)
+# merged = pd.concat([df0, df2])
 
-print('NUM ROWS')
-print('Neelam:', df0.shape[0])
-print('Max:', df2.shape[0])
-print('All:', merged.shape[0])
+# print('NUM ROWS')
+# print('Neelam:', df0.shape[0])
+# print('Max:', df2.shape[0])
+# print('All:', merged.shape[0])
 
-print('\nNEELAM')
-print(df0.describe())
+# print('\nNEELAM')
+# print(df0.describe())
 
-print('\nMAX')
-print(df2.describe())
+# print('\nMAX')
+# print(df2.describe())
 
-print('\nALL')
-print(merged.describe())
+# print('\nALL')
+# print(merged.describe())
 
-df0.to_csv('user0_df_clean.csv')
-df2.to_csv('user2_df_clean.csv')
-merged.to_csv('all_df_clean.csv')
+# df0.to_csv('user0_df_clean.csv')
+df1.to_csv('user1_df_clean.csv')
+# df2.to_csv('user2_df_clean.csv')
+# merged.to_csv('all_df_clean.csv')

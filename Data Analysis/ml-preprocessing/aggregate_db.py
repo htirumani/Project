@@ -24,10 +24,10 @@ sleep = db.sleep
 step = db.step
 
 # define global variables
-START_DATE = datetime.datetime(2021, 5, 31)
-END_DATE = datetime.datetime(2021, 6, 17)
+START_DATE = datetime.datetime(2021, 6, 1)
+END_DATE = datetime.datetime(2021, 6, 19)
 DELTA = datetime.timedelta(minutes = 1)
-USER = 0
+USER = 1
 
 # defines various helper methods used in aggregate_feature_cols
 def get_user_sleep_data(user):
@@ -94,7 +94,7 @@ def aggregate_feature_cols(user):
   sleep_df = get_user_sleep_data(user)
   heart_df = get_user_hr_data(user)
   step_df = get_user_step_data(user)
-  weight_df, height_df = get_user_body_data(user)
+  height_df, weight_df = get_user_body_data(user)
 
 
   print('Aggregating...')
