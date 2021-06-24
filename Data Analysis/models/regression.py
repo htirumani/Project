@@ -17,8 +17,8 @@ u0_df = pd.read_csv(u0_path, index_col=0, parse_dates=['DATE'])
 u2_df = pd.read_csv(u2_path, index_col=0, parse_dates=['DATE'])
 
 # split data to train and test dfs
-u0_split = int(u0_df.shape[0] * 0.9)
-u2_split = int(u2_df.shape[0] * 0.9)
+u0_split = int(u0_df.shape[0] * 0.7)
+u2_split = int(u2_df.shape[0] * 0.7)
 
 u0_train = u0_df[:u0_split]
 u0_test = u0_df[u0_split:]
@@ -61,5 +61,3 @@ print('Num False Positives:', sum(fp))
 print()
 print('False Negative Rate: ', sum(fn) / sum(y_test))
 print('False Positive Rate: ', sum(fp) / sum(np.logical_not(y_test)))
-
-
