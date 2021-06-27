@@ -58,10 +58,9 @@ This additional metric is a binary indicator of whether the current datetime fal
 
 ---
 
-<a name="footnote1"><sup><sub>*</sub></sup></a> <sup><sub>The logic behind this is as follows:
-1\. If sleep data is *not* present ⇒ either the user is not wearing the device or the user is awake.
-2\. If heartrate data is present ⇒ the user is wearing the device.
-3\. If the user is weraing the device ⇒ the device will detect and record sleep accordingly.
-4\. If heartrate data is present ⇒ the device will detect and record sleep.
-∴ If heartrate data is present **and** sleep data is *not* present ⇒ the user is awake.
-</sub></sup>
+<a name="footnote1"><sup><sub>*</sub></sup></a> <sup><sub>The logic behind this is as follows:</sub></sup>
+<sup><sub>1\. If sleep data is *not* present ⇒ either the user is not wearing the device or the user is awake.</sub></sup>
+<sup><sub>2\. If heartrate data is present ⇒ the user is wearing the device.</sub></sup>
+<sup><sub>3\. If the user is weraing the device ⇒ the device will detect and record sleep accordingly.</sub></sup>
+<sup><sub>4\. If heartrate data is present ⇒ the device will detect and record sleep.</sub></sup>
+<sup><sub>∴ If heartrate data is present **and** sleep data is *not* present ⇒ the user is awake.</sub></sup>
