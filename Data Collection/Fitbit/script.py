@@ -116,7 +116,7 @@ def runner(date, user, saveData):
         os.mkdir(new_dir)
         write_json(data_sleep, new_dir+'/sleep.json')
         write_json(data_heart, new_dir+'/heart.json')
-        write_json(data_steps, new_dir+'/steps.json')
+        write_json(data_step, new_dir+'/steps.json')
 
     # push docs to MongoDB
     push_docs(sleep_docs, 'wearabledb', 'sleep')
