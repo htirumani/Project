@@ -17,7 +17,7 @@ split_prop = 0.70
 X_train, y_train, X_test, y_test = custom_train_test_split(['HEART', 'STEP', 'NIGHTTIME', 'MEAN_10MIN_HR', 'SD_10MIN_HR'], [u0_path, u2_path], split_prop)
 
 # define and fit Decision Tree model
-model = DecisionTreeClassifier(splitter='best', random_state=0).fit(X_train, y_train)
+model = DecisionTreeClassifier(criterion='entropy', max_depth=10, splitter='best', random_state=0).fit(X_train, y_train)
 
 # print model performance
 print('Training Accuracy: ', model.score(X_train, y_train))

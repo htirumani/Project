@@ -12,9 +12,9 @@ from pprint import pprint
 
 u0_path = 'Data Analysis/Dataset/final/user0_featured.csv'
 u2_path = 'Data Analysis/Dataset/final/user2_featured.csv'
-split_prop = 0.85
+split_prop = 0.70
 
-X_train, y_train, X_test, y_test = custom_train_test_split(['HEART', 'STEP', 'NIGHTTIME', 'MEAN_10MIN_HR', 'SD_10MIN_HR'], [u0_path, u2_path], split_prop)
+X_train, y_train, X_test, y_test = custom_train_test_split(['HEART', 'STEP', 'MEAN_10MIN_HR', 'SD_10MIN_HR'], [u0_path, u2_path], split_prop)
 
 # define and fit Logistic Regression model
 model = LogisticRegression(random_state=0).fit(X_train, y_train)
