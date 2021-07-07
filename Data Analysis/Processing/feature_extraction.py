@@ -89,6 +89,47 @@ def append_historical_hr_features(df, window):
     df.dropna(inplace=True)
 
 '''
+Appends the sum of the previous 'window' minutes of steps to each row.
+
+Rows missing from the immediate history are assumed 0 values.
+'''
+def append_historical_step_feature(df, window):
+    label = '{}MIN_STEP_SUM'.format(window)
+    
+    df.sort_values('DATE', ascending=True, inplace=True)
+    ixs = np.array(list(range(df.shape[0])))
+    df.set_index(ixs, inplace = True)
+
+    df[mean_label] = None
+    df[sd_label] = None
+
+    for index, row in df.iterrows():
+        
+        # attempt to get row's preceding HR values
+        hist = []
+        punt = False
+        for m in range(1, window+1):
+            if punt: break
+
+            if index - m < 0: 
+                punt = True
+                continue
+
+            curr = df.at[index-m, 'DATE']
+            if curr != row['DATE'] - timedelta(minutes=m): 
+                punt = True
+                continue
+
+            hist.append(df.at[index-m, 'HEART'])
+        
+        # append mean and sd of hist if all data is collected
+        if not punt:
+            df.at[index, mean_label] = np.mean(hist)
+            df.at[index, sd_label] = np.std(hist)
+        
+    df.dropna(inplace=True)
+
+'''
 Takes a list of filepaths, appends extracted features from the data in those files, saves new data to files in 'final' folder.
 
 fps: list of data files on which to append features
