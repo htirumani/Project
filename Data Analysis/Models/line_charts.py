@@ -6,7 +6,7 @@ import os
 
 clean_dir = 'Data Analysis/Dataset/clean'
 l = os.listdir(clean_dir)
-l.remove('all.csv')
+l.remove('all_clean.csv')
 
 # l = ['user0_clean.csv']
 
@@ -19,6 +19,6 @@ for i in l:
     w = df['STEP']
 
     plt.plot(x,z, color="red", alpha=0.5)
-    plt.plot(x, y)
+    plt.plot(x, w)
     plt.title(i)
     plt.show()

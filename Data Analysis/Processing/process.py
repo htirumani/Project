@@ -87,32 +87,26 @@ def add_null(data, sdate, edate):
 	
 	return col
 
-def add_null_pd(data, sdate, edate):
-	df_none = pd.DataFrame(index=get_minutes_list(sdate, edate))
-	df_none['VAL'] = None
-	df = pd.DataFrame({'VAL': [d[1] for d in data]}, index=[d[0] for d in data])
-	df_none.update(df)
 
-	return df_none['VAL'].tolist()
-
-def add_null_4(data, sdate, edate):
-	df_none = pd.DataFrame({'DATE': get_minutes_list(sdate, edate)})
-	df_none['VAL'] = None
-	df = pd.DataFrame({'VAL': [d[1] for d in data]}, index=[d[0] for d in data])
-
-
-def add_null_improved(data, sdate, edate):
+def add_null_improved(data, sdate, edate, verbose= False):
 	times = get_minutes_list(sdate, edate)
 	col = [(t, None) for t in times]
 
 	l = len(data)
 	c = 0
+	if times[0] > data[c][0]:
+		d_times = [d[0] for d in data]
+		c = d_times.index(times[0])
+
 	for ix, t in enumerate(times):
 		if t == data[c][0]:
+			if verbose: print('HIT at ', t, data[c][0])
 			col[ix] = (data[c][0], data[c][1])
 			c += 1
 			if c == len(data):
 				return [i[1] for i in col]
+		else:
+			if verbose: print('MISS at ', t, data[c][0])
 
 	return [i[1] for i in col]
 

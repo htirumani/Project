@@ -4,7 +4,7 @@ import os
 from datetime import datetime, timedelta
 from pprint import pprint
 
-from process import process_heart, process_sleep, process_steps, add_null, add_null_improved, add_null_pd
+from process import process_heart, process_sleep, process_steps, add_null, add_null_improved
 
 path = '../Fitabase-Data-All'
 
@@ -117,6 +117,7 @@ def process_all(root_path, processed_heart_fp):
 
     delta = timedelta(minutes=1)
     for user, (stime, etime) in ranges:
+        if user != 4020332650: continue
 
         print('Processing user: {}'.format(user))
 
@@ -153,7 +154,8 @@ def process_all(root_path, processed_heart_fp):
         step_values = user_step['Steps'].tolist()
         step_list = [(d, v) for d, v in zip(step_dates, step_values)]
         print('...')
-        step_list = add_null_improved(step_list, stime, etime)
+        step_list = add_null_improved(step_list, stime, etime, verbose=True)
+        print(len([s for s in step_list if s != None]))
 
         print('Cleaning...')
         df = pd.DataFrame({
