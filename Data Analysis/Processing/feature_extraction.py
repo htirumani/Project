@@ -45,6 +45,41 @@ def append_nighttime_feature(df):
     df['NIGHTTIME'] = hours
 
 '''
+1 for Monday - Friday, 0 for Saturday - Sunday
+'''
+
+def append_weekday_feature(df):
+    times = df['DATE'].to_list()
+    days = []
+    for time in times:
+        time = time[:-9]
+        if datetime.datetime.strptime(time, '%Y-%m-%d').weekday():
+            days.append(1)
+        else: days.append(0)
+    modded = df.assign(WEEKDAY=days)
+    df = modded
+
+'''
+minute-by-minute running total that turns over at 4am
+'''
+
+def append_activity_feature(df):
+    steps = df['STEP'].to_list()
+    times = df['DATE'].to_list()
+    sum = 0
+    activity = []
+    for step, time in zip(steps, times):
+        time = time[:-3]
+        new_time = datetime.datetime.strptime(time, '%Y-%m-%d %H:%M')
+        if (new_time.hour == 4 and new_time.minute == 0):
+            sum = 0
+        else: 
+            sum += step
+        activity.append(sum)
+    modded = df.assign(ACTIVITY=activity)
+    df = modded
+
+'''
 appends both MEAN_{}MIN_HR and SD_{}MIN_HR
 corresponding to mean and sd of HR data for previous 'window' minutes
 
