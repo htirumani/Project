@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import os
 
 '''
 We'll import the data from each user seperately, so we can do a train-test split before shuffling.
@@ -38,3 +39,16 @@ def custom_train_test_split(features, user_paths, split_prop, shuffle_train=True
     y_test = np.concatenate(tuple([df['SLEEP'].to_numpy() for df in test_dfs]))
 
     return X_train, y_train, X_test, y_test
+
+def combine_user_csvs(clean_path):
+    dfs = []
+    for i in os.listdir(clean_path):
+        dfs.append(pd.read_csv(clean_path + '/' + i)[['USER', 'DATE', 'SLEEP', 'HEART', 'STEP']])
+    df_all = pd.concat(dfs, axis=0)
+    df_all.to_csv(clean_path + '/all_clean.csv')
+
+def main():
+    combine_user_csvs('Data Analysis/Dataset/clean')
+
+if __name__ == '__main__':
+    main()

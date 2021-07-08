@@ -16,8 +16,10 @@ for label, tlabel in zip(labels, tlabels):
     df1 = pd.read_csv(path + label + '_1' + '.csv', parse_dates=[tlabel])
 
     df = pd.concat([df0, df1])
-    df.sort_values(['Id', tlabel], inplace=True)
     df.reset_index(inplace=True)
+    df.drop('index', axis=1, inplace=True)
+    df.drop_duplicates(inplace=True)
+    df.sort_values(['Id', tlabel], inplace=True)
 
     df.to_csv(path + label + '_all.csv')
 

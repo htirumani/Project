@@ -8,7 +8,7 @@ clean_dir = 'Data Analysis/Dataset/clean'
 l = os.listdir(clean_dir)
 l.remove('all.csv')
 
-l = ['user0_clean.csv']
+# l = ['user0_clean.csv']
 
 for i in l:
     print(i)

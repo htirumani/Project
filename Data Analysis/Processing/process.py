@@ -61,6 +61,16 @@ def grab_body(db, user):
 
 	return add_null(height, START_DATE, END_DATE), add_null(weight, START_DATE, END_DATE)
 
+
+def get_minutes_list(stime, etime):
+    delta = datetime.timedelta(minutes=1)
+    times = []
+    while stime != etime:
+        times.append(stime.to_datetime64())
+        stime = stime + delta
+    
+    return times
+
 '''
 Data is a list of tuples of the form (date, value)
 '''
@@ -70,13 +80,41 @@ def add_null(data, sdate, edate):
 	col = []
 	while curr_date != edate:
 		if curr_date in valid_dates:
-			col.append([i[1] for i in data if i[0] == curr_date][0])
+			col.append(data[valid_dates.index(curr_date)][1])
 		else:
 			col.append(None)
 		curr_date += DELTA
 	
 	return col
 
+def add_null_pd(data, sdate, edate):
+	df_none = pd.DataFrame(index=get_minutes_list(sdate, edate))
+	df_none['VAL'] = None
+	df = pd.DataFrame({'VAL': [d[1] for d in data]}, index=[d[0] for d in data])
+	df_none.update(df)
+
+	return df_none['VAL'].tolist()
+
+def add_null_4(data, sdate, edate):
+	df_none = pd.DataFrame({'DATE': get_minutes_list(sdate, edate)})
+	df_none['VAL'] = None
+	df = pd.DataFrame({'VAL': [d[1] for d in data]}, index=[d[0] for d in data])
+
+
+def add_null_improved(data, sdate, edate):
+	times = get_minutes_list(sdate, edate)
+	col = [(t, None) for t in times]
+
+	l = len(data)
+	c = 0
+	for ix, t in enumerate(times):
+		if t == data[c][0]:
+			col[ix] = (data[c][0], data[c][1])
+			c += 1
+			if c == len(data):
+				return [i[1] for i in col]
+
+	return [i[1] for i in col]
 
 """
 Various methods to then clean up the initial dataframe and

@@ -4,7 +4,7 @@ import os
 from datetime import datetime, timedelta
 from pprint import pprint
 
-from process import process_heart, process_sleep, process_steps, add_null
+from process import process_heart, process_sleep, process_steps, add_null, add_null_improved, add_null_pd
 
 path = '../Fitabase-Data-All'
 
@@ -50,6 +50,9 @@ def reduce_heart_df(heart_df, fp):
 
     return df
 
+'''
+Sleep data is sometimes reported at time XX:XX:30, needs to be at XX:XX:00
+'''
 def correct_sleep_df(sleep_df):
     times = sleep_df['date'].tolist()
     times = [t.replace(second = 0) for t in times]
@@ -71,20 +74,9 @@ Given a user, returns a tuple of the earliest and latest records in the SLEEP cs
 '''
 def get_user_date_range(sleep_df, user_id):
     df = sleep_df[sleep_df['Id'] == user_id]
+    dates = (df['date'].min(), df['date'].max())
 
-    return (df['date'].min(), df['date'].max())
-
-
-def get_user_heart_df(heart_df, user, stime, etime):
-    print('Filtering for user {}'.format(user))
-    df = heart_df[heart_df['Id'] == user]
-    print('done')
-
-def get_user_sleep_df(sleep_df, user, stime, etime):
-    pass
-
-def get_user_step_df(step_df, user, stime, etime):
-    pass
+    return dates
 
 def get_minutes_list(stime, etime):
     delta = timedelta(minutes=1)
@@ -125,14 +117,17 @@ def process_all(root_path, processed_heart_fp):
 
     delta = timedelta(minutes=1)
     for user, (stime, etime) in ranges:
+
         print('Processing user: {}'.format(user))
+
+        print('Setting up...')
         times = get_minutes_list(stime, etime)
 
         sleep = [None for i in range(len(times))]
         heart = [None for i in range(len(times))]
         step = [None for i in range(len(times))]
 
-        print('Subsetting')
+        print('Subsetting...')
         user_sleep = sleep_df[sleep_df['Id'] == user]
         user_heart = heart_df[heart_df['USER'] == user]
         user_step = step_df[step_df['Id'] == user]
@@ -140,21 +135,25 @@ def process_all(root_path, processed_heart_fp):
         date_list = get_minutes_list(stime, etime)
 
         print('Processing Sleep...')
-        sleep_list = user_sleep['date'].tolist()
-        sleep_list = [(i, 1) for i in sleep_list]  # all recorded values in sleep csv correspond to some phase of sleep (not awake)
-        sleep_list = add_null(sleep_list, stime, etime)
+        sleep_dates = user_sleep['date'].tolist()
+        sleep_values = user_sleep['value'].tolist()
+        sleep_list = [(d, 1) for d, v in zip(sleep_dates, sleep_values) if v != 3]  # omitted v=3 values will be repopulated with 'awake' on cleaning
+        print('...')
+        sleep_list = add_null_improved(sleep_list, stime, etime)
         
         print('Processing Heart...')
         heart_dates = user_heart['DATE'].tolist()
         heart_values = user_heart['HEART'].tolist()
         heart_list = [(d, v) for d, v in zip(heart_dates, heart_values)]
-        heart_list = add_null(heart_list, stime, etime)
+        print('...')
+        heart_list = add_null_improved(heart_list, stime, etime)
 
         print('Processing Step...')
         step_dates = user_step['ActivityMinute'].tolist()
         step_values = user_step['Steps'].tolist()
         step_list = [(d, v) for d, v in zip(step_dates, step_values)]
-        step_list = add_null(step_list, stime, etime)
+        print('...')
+        step_list = add_null_improved(step_list, stime, etime)
 
         print('Cleaning...')
         df = pd.DataFrame({
@@ -167,11 +166,8 @@ def process_all(root_path, processed_heart_fp):
         df.to_csv('user{}_raw.csv'.format(user))
 
         process_heart(df)
-        print(df.describe())
         process_sleep(df)
-        print(df.describe())
         process_steps(df)
-        print(df.describe())
         df.dropna(inplace=True)
         df['USER'] = df['USER'].astype(int)
         df['HEART'] = df['HEART'].astype(int)
@@ -179,7 +175,6 @@ def process_all(root_path, processed_heart_fp):
         df['STEP'] = df['STEP'].astype(int)
 
         df.to_csv('user{}_clean.csv'.format(user))
-
 
 process_all(path, path + '/minuteHR_reduced_all.csv')
 
