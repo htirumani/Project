@@ -67,16 +67,20 @@ def append_activity_feature(df):
     steps = df['STEP'].to_list()
     times = df['DATE'].to_list()
     sum = 0
+    minutes_since_reset = 0
     activity = []
     for step, time in zip(steps, times):
         time = time[:-3]
-        new_time = datetime.strptime(time, '%Y-%m-%d %H:%M')
-        if (new_time.hour == 4 and new_time.minute == 0):
+        new_time = datetime.datetime.strptime(time, '%Y-%m-%d %H:%M')
+        if (new_time.hour == 4 and new_time.minute == 0) or (minutes_since_reset > 1440):
             sum = 0
+            minutes_since_reset = 0
         else: 
             sum += step
+            minutes_since_reset += 1
         activity.append(sum)
-    df['ACTIVITY'] = activity
+    modded = df.assign(ACTIVITY=activity)
+    df = modded
 
 '''
 appends both MEAN_{}MIN_HR and SD_{}MIN_HR
