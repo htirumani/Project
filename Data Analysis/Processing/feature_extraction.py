@@ -79,9 +79,27 @@ def append_activity_feature(df):
             sum += step
             minutes_since_reset += 1
         activity.append(sum)
-    modded = df.assign(ACTIVITY=activity)
-    df = modded
+    df = df.assign(ACTIVITY=activity)
 
+'''
+how many minutes of sleep in the past 24 hrs
+'''
+
+def append_previous_sleep_feature(df):
+    sleep = df['SLEEP'].tolist()
+    mins_of_sleep = 0
+    minutes_since_reset = 0
+    previous_sleep = []
+    for s in sleep:
+        if(minutes_since_reset > 1440):
+            minutes_since_reset = 0
+            mins_of_sleep = 0
+        elif (s == 1):
+            mins_of_sleep += 1
+        minutes_since_reset += 1
+        previous_sleep.append(mins_of_sleep)
+    df = df.assign(PSLEEP=previous_sleep)
+    
 '''
 appends both MEAN_{}MIN_HR and SD_{}MIN_HR
 corresponding to mean and sd of HR data for previous 'window' minutes
