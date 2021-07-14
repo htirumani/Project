@@ -4,16 +4,24 @@ import datetime
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import confusion_matrix, classification_report, make_scorer, precision_score, recall_score, accuracy_score
+import os
 
 from utils import custom_train_test_split
 
 from pprint import pprint
 
-u0_path = 'Data Analysis/Dataset/final/user0_featured.csv'
-u2_path = 'Data Analysis/Dataset/final/user2_featured.csv'
-split_prop = 1.0
 
-X_train, y_train, X_test, y_test = custom_train_test_split(['HEART', 'STEP', 'NIGHTTIME', 'MEAN_10MIN_HR', 'SD_10MIN_HR'], [u0_path, u2_path], split_prop)
+features = ['HEART', 'STEP', 'ACTIVITY', '10MIN_STEP_SUM', 'MINFROMMIDNIGHT']
+
+# get train and test sets
+split_prop = 1.0
+data_path = 'Data Analysis/Dataset/final/'
+fps = os.listdir(data_path)
+fps.remove('combined')
+fps.remove('validation')
+
+paths = [data_path + f for f in fps]
+X_train, y_train, X_test, y_test = custom_train_test_split(features, paths, split_prop)
 
 criterion = ['gini', 'entropy']
 max_depth = [2,4,6,8,10,12]
@@ -23,6 +31,7 @@ scoring = {'accuracy': make_scorer(accuracy_score), 'precision': make_scorer(pre
 grid = GridSearchCV(DecisionTreeClassifier(), params, scoring=scoring, refit=False).fit(X_train, y_train)
 
 results = pd.DataFrame(grid.cv_results_)
+results.to_csv('decision_tree_grid_results.csv')
 print(results)
 
 

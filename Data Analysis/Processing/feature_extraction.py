@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date, time
 from datetime import timedelta
 import pandas as pd
 import numpy as np
@@ -48,7 +48,6 @@ def append_nighttime_feature(df):
 '''
 1 for Monday - Friday, 0 for Saturday - Sunday
 '''
-
 def append_weekday_feature(df):
     times = df['DATE'].to_list()
     days = []
@@ -61,44 +60,53 @@ def append_weekday_feature(df):
     df = modded
 
 '''
-minute-by-minute running total that turns over at 4am
+Helper for append_activity_feature
+'''
+def get_cutoff(dt):
+    if dt.time().hour < 4:
+        return dt.replace(hour=4, minute=0)
+    else:
+        return (dt + timedelta(days = 1)).replace(hour = 4, minute = 0)
+
+'''
+minute-by-minute running total of steps that turns over at 4am
 '''
 def append_activity_feature(df):
     steps = df['STEP'].to_list()
     times = df['DATE'].to_list()
-    sum = 0
-    minutes_since_reset = 0
     activity = []
+
+    sum = 0
+    cutoff = get_cutoff(times[0])
     for step, time in zip(steps, times):
-        time = time[:-3]
-        new_time = datetime.datetime.strptime(time, '%Y-%m-%d %H:%M')
-        if (new_time.hour == 4 and new_time.minute == 0) or (minutes_since_reset > 1440):
+
+        if time > cutoff:
             sum = 0
-            minutes_since_reset = 0
+            cutoff = get_cutoff(time)
         else: 
             sum += step
-            minutes_since_reset += 1
+        
         activity.append(sum)
-    df = df.assign(ACTIVITY=activity)
+
+    df['ACTIVITY'] = activity
 
 '''
 how many minutes of sleep in the past 24 hrs
 '''
-
 def append_previous_sleep_feature(df):
     sleep = df['SLEEP'].tolist()
     mins_of_sleep = 0
     minutes_since_reset = 0
     previous_sleep = []
     for s in sleep:
-        if(minutes_since_reset > 1440):
+        if (minutes_since_reset > 1440):
             minutes_since_reset = 0
             mins_of_sleep = 0
         elif (s == 1):
             mins_of_sleep += 1
         minutes_since_reset += 1
         previous_sleep.append(mins_of_sleep)
-    df = df.assign(PSLEEP=previous_sleep)
+    df['PSLEEP'] = previous_sleep
     
 '''
 appends both MEAN_{}MIN_HR and SD_{}MIN_HR
@@ -152,38 +160,41 @@ Rows missing from the immediate history are assumed 0 values.
 def append_historical_step_feature(df, window):
     label = '{}MIN_STEP_SUM'.format(window)
     
+    df['DATE'] = pd.to_datetime(df['DATE'])
     df.sort_values('DATE', ascending=True, inplace=True)
     ixs = np.array(list(range(df.shape[0])))
     df.set_index(ixs, inplace = True)
 
-    df[mean_label] = None
-    df[sd_label] = None
+    df[label] = None
 
     for index, row in df.iterrows():
-        
-        # attempt to get row's preceding HR values
+        # attempt to get row's preceding Step values
         hist = []
-        punt = False
         for m in range(1, window+1):
-            if punt: break
-
             if index - m < 0: 
-                punt = True
                 continue
 
             curr = df.at[index-m, 'DATE']
             if curr != row['DATE'] - timedelta(minutes=m): 
-                punt = True
                 continue
 
-            hist.append(df.at[index-m, 'HEART'])
+            hist.append(df.at[index-m, 'STEP'])
         
-        # append mean and sd of hist if all data is collected
-        if not punt:
-            df.at[index, mean_label] = np.mean(hist)
-            df.at[index, sd_label] = np.std(hist)
+        # append sum of hist if all data is collected
+        df.at[index, label] = np.sum(hist)
         
     df.dropna(inplace=True)
+
+'''
+Appends a column to the dataframe representing the number of minutes from midnight of the current time
+'''
+def append_min_midnight(df):
+  d = date.today()
+  m = datetime.combine(d, time(0))
+  times = df['DATE'].to_list()
+  min = [int((datetime.combine(d, t.time())-m).total_seconds() / 60)
+        for t in times]
+  df['MINFROMMIDNIGHT'] = min
 
 '''
 Takes a list of filepaths, appends extracted features from the data in those files, saves new data to files in 'final' folder.
@@ -195,11 +206,22 @@ validation: should the processed files go into the validation folder
 nighttime...historical_hr: boolean on whether to include said feature
 historical_hr_window: window argument for historical hr feature
 '''
-def append_and_write(fps, users, combine_filename = None, validation = False, activity = False, nighttime = False, historical_hr = False, historical_hr_window = None):
+def append_and_write(fps, users, combine_filename=None, validation=False,
+            nighttime=False,
+            historical_hr=False,
+            historical_hr_window=None,
+            activity=False,
+            historical_step=False,
+            historical_step_window=None,
+            previous_sleep=False,
+            weekday=False,
+            mins_to_midnight=False,
+            **kwargs
+            ):
     all_dfs = []
     for path, user in zip(fps, users):
         print('Processing user', user)
-        df = pd.read_csv(path)
+        df = pd.read_csv(path, parse_dates=['DATE'])
 
         if nighttime:
             print('Appending nighttime...')
@@ -208,8 +230,20 @@ def append_and_write(fps, users, combine_filename = None, validation = False, ac
             print('Appending historical HR...')
             append_historical_hr_features(df, historical_hr_window)
         if activity:
-            print('Appending activity...')
+            print('Appending Activity...')
             append_activity_feature(df)
+        if historical_step:
+            print('Appending Historical Step...')
+            append_historical_step_feature(df, historical_step_window)
+        if previous_sleep:
+            print('Appending Previous Sleep')
+            append_previous_sleep_feature(df)
+        if weekday:
+            print('Appending Weekday')
+            append_weekday_feature(df)
+        if mins_to_midnight:
+            print('Appending Minutes to Midnight')
+            append_min_midnight(df)
 
         print('Writing data...')
         if validation:
@@ -229,7 +263,7 @@ def main():
     data_path = 'Data Analysis/Dataset/clean/'
     fps = os.listdir(data_path)
     fps.remove('all_clean.csv')
-    users = [int(u[4:-10]) for u in fps]
+    users = [int(u[4:-10]) for u in fps] # extract integer id from filename
 
     val_fps = ['user4020332650_clean.csv', 'user6775888955_clean.csv']
     val_users = [int(u[4:-10]) for u in val_fps]
@@ -240,8 +274,23 @@ def main():
     fps = [data_path + fp for fp in fps]
     val_fps = [data_path + fp for fp in val_fps]
 
-    append_and_write(fps, users, combine_filename='all_featured.csv', activity=True)
-    append_and_write(val_fps, val_users, combine_filename='validation_featured.csv', validation=True, activity=True)
+    feature_args = {
+        'nighttime': False,
+        'historical_hr': False,
+        'historical_hr_window': None,
+        'activity': True,
+        'historical_step': True,
+        'historical_step_window': 10,
+        'previous_sleep': True,
+        'weekday': False,
+        'mins_to_midnight': True,
+    }
+
+    # Append features for train/test set
+    append_and_write(fps, users, combine_filename='all_featured.csv', **feature_args)
+
+    # Append features for validation set
+    append_and_write(val_fps, val_users, combine_filename='validation_featured.csv', validation=True, **feature_args)
 
 if __name__ == '__main__':
     main()

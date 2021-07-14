@@ -40,6 +40,24 @@ def custom_train_test_split(features, user_paths, split_prop, shuffle_train=True
 
     return X_train, y_train, X_test, y_test
 
+def get_user_predictions(model, features, data_path, save_dir_path):
+    fps = os.listdir(data_path)
+    fps.remove('combined')
+    fps.remove('validation')
+
+    for f in fps:
+        df = pd.read_csv(data_path + f, index_col=0)
+        X = df[features].to_numpy()
+        y = df['SLEEP'].to_numpy()
+
+        preds = model.predict(X)
+
+        df['PRED'] = preds
+        df['CORRECT'] = (preds == y).astype(int)
+
+        df.to_csv(save_dir_path + f[5:-13] + '_preds.csv')
+
+
 def combine_user_csvs(clean_path):
     dfs = []
     for i in os.listdir(clean_path):

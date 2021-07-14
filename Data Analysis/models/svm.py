@@ -5,15 +5,20 @@ from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
-df = pd.read_csv("activity_featured.csv", index_col=0, parse_dates=['DATE'])
+path = 'Data Analysis/Dataset/final/'
+print('Loading')
+df = pd.read_csv(path + "combined/all_featured.csv")
 
+print('Converting')
 X, y = df[['HEART', 'STEP', 'ACTIVITY']].to_numpy(), df['SLEEP'].to_numpy()
 
+print('Splitting')
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.20)
 
+print('Init')
 # fitting an SVM using a linear kernel
-
-svclassifier = SVC(kernel='linear')
+svclassifier = SVC(kernel='linear', max_iter=10000)
+print('Fit')
 svclassifier.fit(X_train, y_train)
 
 # prediction and evaluation
