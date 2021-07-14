@@ -197,16 +197,45 @@ def append_min_midnight(df):
   df['MINFROMMIDNIGHT'] = min
 
 '''
+Binary variable indicating the probability the user will be asleep in the next n minutes.
+'''
+def append_nmin_sleep_prob(df, n):
+    sleep = df['SLEEP'].tolist()
+    dates = df['DATE'].tolist()
+    probs = [None for i in sleep]
+
+    for i, (s, d) in enumerate(zip(sleep, dates)):
+        if s != 1:
+            probs[i] = 0
+            continue
+
+        probs[i] = None
+        for diff in range(1, n + 1):
+            j = i - diff
+            if j < 0: break                                 # break if index is bad
+            if ((d - dates[j]).seconds / 60) < n: continue # break if preceding index doesn't represent preceding time
+            if sleep[j] == 1: continue                         # break if user is asleep at index
+            probs[j] = 1  # assign future sleep probability to 1
+    
+    label = '{}MIN_SLEEP_PROB'.format(n)
+    df[label] = probs
+        
+
+
+'''
 Takes a list of filepaths, appends extracted features from the data in those files, saves new data to files in 'final' folder.
 
 fps: list of data files on which to append features
 users: list of user indexes corresponding to files in fps
 combine_filename: if not none, appends all user's processed data to a file 'combined_filename'
 validation: should the processed files go into the validation folder
-nighttime...historical_hr: boolean on whether to include said feature
-historical_hr_window: window argument for historical hr feature
+sleep_prob: append sleep probability variable?
+sleep_prob_n: integer or list of integers specifying the 'n' value for sleep probability, if list append a column for each n value.
+nighttime... : boolean on whether to include said feature
 '''
 def append_and_write(fps, users, combine_filename=None, validation=False,
+            sleep_prob=False,
+            sleep_prob_n=None,
             nighttime=False,
             historical_hr=False,
             historical_hr_window=None,
@@ -222,6 +251,15 @@ def append_and_write(fps, users, combine_filename=None, validation=False,
     for path, user in zip(fps, users):
         print('Processing user', user)
         df = pd.read_csv(path, parse_dates=['DATE'])
+
+        if sleep_prob:
+            if type(sleep_prob_n) != list:
+                print('Appending {}min sleep prob'.format(sleep_prob_n))
+                append_nmin_sleep_prob(df, sleep_prob_n)
+            else:
+                for n in sleep_prob_n:
+                    print('Appending {}min sleep prob'.format(n))
+                    append_nmin_sleep_prob(df, n)
 
         if nighttime:
             print('Appending nighttime...')
@@ -275,6 +313,8 @@ def main():
     val_fps = [data_path + fp for fp in val_fps]
 
     feature_args = {
+        'sleep_prob': True,
+        'sleep_prob_n': [5, 15, 30, 60],
         'nighttime': False,
         'historical_hr': False,
         'historical_hr_window': None,
