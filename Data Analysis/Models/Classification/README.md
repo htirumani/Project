@@ -1,4 +1,4 @@
-# Documentation for Models
+# Models For Classification (Binary)
 
 ## SVM visualization
 - red dots = support vectors = points on the hyperplane
