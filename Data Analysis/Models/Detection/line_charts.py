@@ -23,7 +23,7 @@ for i in l:
     df = pd.read_csv(ddir + '/' + i, parse_dates=['DATE'])
     d = df['DATE']
     heart = df['HEART']
-    sleep = df['SLEEP'] * 16000
+    sleep = df['SLEEP'] * 200
     step = df['STEP']
     activity = df['ACTIVITY']
     step10min = df['10MIN_STEP_SUM']
@@ -35,6 +35,8 @@ for i in l:
 
     plt.figure(figsize=(25,12))
     plt.stem(d, sleep, markerfmt=' ', linefmt='lightgray', basefmt='white')
-    plt.scatter(d, activity, c=incorrect, s=5, zorder=2, alpha=0.5, linewidth=0.5)
-    plt.title(i)
+    plt.scatter(d, heart, c='black', s=5, zorder=2, alpha=0.5, linewidth=0.5)
+    plt.xlabel('Time')
+    plt.ylabel('Heart Rate')
+    plt.title('Sample Heart Rate/Sleep Chart')
     plt.show()

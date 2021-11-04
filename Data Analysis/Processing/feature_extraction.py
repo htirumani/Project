@@ -6,6 +6,8 @@ from pprint import pprint
 from matplotlib import pyplot as plt
 import os
 
+from process import add_null_improved
+
 '''
 Given a clean dataframe FROM A SINGLE USER, returns a list of tuples
 containing start and end times of contiguous chunks of data.
@@ -107,7 +109,34 @@ def append_previous_sleep_feature(df):
         minutes_since_reset += 1
         previous_sleep.append(mins_of_sleep)
     df['PSLEEP'] = previous_sleep
-    
+
+'''
+Sum of minutes labeled asleep in the previous 'window' HOURS
+'''
+def append_historical_sleep_feature(df, window):
+    sleep = df['SLEEP'].tolist()
+    times = df['DATE'].tolist()
+    data = [(t, s) for t, s in zip(times, sleep)]
+
+    sleep = add_null_improved(data, times[0], times[-1])
+
+    mins = window * 60
+    stotal = []
+    for i, s in enumerate(sleep):
+        rmin = max(0, i - mins)
+        stotal.append(sum(filter(None, sleep[rmin:i+1])))
+
+    stotal = [total for total, s in zip(stotal, sleep) if s != None]
+    stotal.append(0) ########### FIXME
+    label = '{}HR_SLEEP_TOTAL'.format(window)
+    df[label] = stotal
+
+'''
+at each minute, gives the sum of the minutes recorded as asleep in the previous n hours.
+'''
+def append_n_hour_sleep_total(n):
+    pass
+
 '''
 appends both MEAN_{}MIN_HR and SD_{}MIN_HR
 corresponding to mean and sd of HR data for previous 'window' minutes
@@ -213,14 +242,12 @@ def append_nmin_sleep_prob(df, n):
         for diff in range(1, n + 1):
             j = i - diff
             if j < 0: break                                 # break if index is bad
-            if ((d - dates[j]).seconds / 60) < n: continue # break if preceding index doesn't represent preceding time
+            if ((d - dates[j]).seconds / 60) < n: continue   # break if preceding index doesn't represent preceding time
             if sleep[j] == 1: continue                         # break if user is asleep at index
             probs[j] = 1  # assign future sleep probability to 1
     
     label = '{}MIN_SLEEP_PROB'.format(n)
     df[label] = probs
-        
-
 
 '''
 Takes a list of filepaths, appends extracted features from the data in those files, saves new data to files in 'final' folder.
@@ -245,21 +272,14 @@ def append_and_write(fps, users, combine_filename=None, validation=False,
             previous_sleep=False,
             weekday=False,
             mins_to_midnight=False,
+            historical_sleep=True,
+            historical_sleep_windows=None,
             **kwargs
             ):
     all_dfs = []
     for path, user in zip(fps, users):
         print('Processing user', user)
         df = pd.read_csv(path, parse_dates=['DATE'])
-
-        if sleep_prob:
-            if type(sleep_prob_n) != list:
-                print('Appending {}min sleep prob'.format(sleep_prob_n))
-                append_nmin_sleep_prob(df, sleep_prob_n)
-            else:
-                for n in sleep_prob_n:
-                    print('Appending {}min sleep prob'.format(n))
-                    append_nmin_sleep_prob(df, n)
 
         if nighttime:
             print('Appending nighttime...')
@@ -274,14 +294,27 @@ def append_and_write(fps, users, combine_filename=None, validation=False,
             print('Appending Historical Step...')
             append_historical_step_feature(df, historical_step_window)
         if previous_sleep:
-            print('Appending Previous Sleep')
+            print('Appending Previous Sleep...')
             append_previous_sleep_feature(df)
         if weekday:
-            print('Appending Weekday')
+            print('Appending Weekday...')
             append_weekday_feature(df)
         if mins_to_midnight:
-            print('Appending Minutes to Midnight')
+            print('Appending Minutes to Midnight....')
             append_min_midnight(df)
+        if historical_sleep:
+            for i in historical_sleep_windows:
+                print('Appending {}HR Historical Sleep...'.format(i))
+                append_historical_sleep_feature(df, i)
+
+        if sleep_prob:
+            if type(sleep_prob_n) != list:
+                print('Appending {}min sleep prob...'.format(sleep_prob_n))
+                append_nmin_sleep_prob(df, sleep_prob_n)
+            else:
+                for n in sleep_prob_n:
+                    print('Appending {}min sleep prob...'.format(n))
+                    append_nmin_sleep_prob(df, n)
 
         print('Writing data...')
         if validation:
@@ -324,6 +357,8 @@ def main():
         'previous_sleep': True,
         'weekday': False,
         'mins_to_midnight': True,
+        'historical_sleep': True,
+        'historical_sleep_windows': [8, 12, 24]
     }
 
     # Append features for train/test set

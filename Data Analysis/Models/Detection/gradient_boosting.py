@@ -11,7 +11,7 @@ from utils import custom_train_test_split, get_user_predictions
 
 from pprint import pprint
 
-features = ['HEART', 'STEP', 'ACTIVITY', '10MIN_STEP_SUM', 'MINFROMMIDNIGHT', 'PSLEEP']
+features = ['HEART', 'STEP', 'ACTIVITY', '10MIN_STEP_SUM', 'MINFROMMIDNIGHT', '24HR_SLEEP_TOTAL']
 
 # get train and test sets
 split_prop = 0.30
@@ -42,19 +42,23 @@ model = GradientBoostingClassifier(
 print('Training Accuracy: ', model.score(X_train, y_train))
 print('Testing Accuracy: ', model.score(X_test, y_test))
 
-y_hat = model.predict(X_test)
-errs = y_hat != y_test
-fn = y_test & np.logical_not(y_hat)
-fp = np.logical_not(y_test) & y_hat
+y_hat_train = model.predict(X_train)
+y_hat_test = model.predict(X_test)
+errs = y_hat_test != y_test
+fn = y_test & np.logical_not(y_hat_test)
+fp = np.logical_not(y_test) & y_hat_test
 
 print()
-print('Confusion Matrix\n', confusion_matrix(y_test, y_hat))
+print('Confusion Matrix\n', confusion_matrix(y_test, y_hat_test))
 
 print()
-print('Classification Report\n', classification_report(y_test, y_hat))
+print('Training Classification Report\n', classification_report(y_train, y_hat_train, digits=3))
 
 print()
-print('Testing Errors: {} / {}'.format(sum(errs), y_hat.shape[0]))
+print('Testing Classification Report\n', classification_report(y_test, y_hat_test, digits=3))
+
+print()
+print('Testing Errors: {} / {}'.format(sum(errs), y_hat_test.shape[0]))
 print('Num False Negatives:', sum(fn))
 print('Num False Positives:', sum(fp))
 

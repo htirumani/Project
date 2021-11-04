@@ -43,23 +43,26 @@ def custom_train_test_split(features, user_paths, split_prop, label='SLEEP', shu
 
     return X_train, y_train, X_test, y_test
 
-def get_user_predictions(model, features, data_path, save_dir_path, label):
+def get_user_predictions(model, features, data_path, save_dir_path, label, get_probs=False):
     fps = os.listdir(data_path)
     fps.remove('combined')
     fps.remove('validation')
 
     for f in fps:
         df = pd.read_csv(data_path + f, index_col=0)
-        df.dropna(inplace=True)
+        df.fillna(-1, inplace=True)
         X = df[features].to_numpy()
         y = df[label].to_numpy()
 
         preds = model.predict(X)
-
+        pred_probs = None
+        if get_probs:
+            pred_probs = model.predict_proba(X)[:,1]
+        
         df['PRED'] = preds
+        if get_probs: df['PROBS'] = pred_probs
 
         df.to_csv(save_dir_path + f[4:-13] + '_preds.csv')
-
 
 def combine_user_csvs(clean_path):
     dfs = []
